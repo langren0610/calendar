@@ -9,6 +9,7 @@ import android.widget.CalendarView;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity implements MyCalendarView.ClickDateListener {
 
@@ -27,9 +28,7 @@ public class MainActivity extends AppCompatActivity implements MyCalendarView.Cl
 
 
     @Override
-    public void clickDate(long mills) {
-        Timestamp timestamp = new Timestamp(mills);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Log.i(TAG, "clickDate time[" + simpleDateFormat.format(timestamp) +  "]");
+    public void clickDate(String formatterTime) {
+        Log.i(TAG, "clickDate time[" + formatterTime +  "]");
     }
 }

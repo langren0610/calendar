@@ -1,24 +1,15 @@
 package com.chaojie.mycalcdata;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
-import android.os.Handler;
 import android.util.AttributeSet;
-import android.util.LayoutDirection;
-import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import org.w3c.dom.ProcessingInstruction;
-
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -222,6 +213,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
                 viewHolder.linearLayoutMain.addView(viewHolderChild.linearLayout);//将日期布局添加到一周日期栏布局中
                 viewHolder.viewHolderChildList.add(viewHolderChild);//将一周日期栏布局添加到日期主布局中
 
+                viewHolderChild.linearLayout.setId(i * ONE_WEEK + (j + 1));
                 viewHolderChild.linearLayout.setOnClickListener(this);//设置点击日期监听事件
             }
 
@@ -325,7 +317,9 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
             }
             viewHolderChild.textViewLunar.setText(lunar);
 
-            viewHolderChild.linearLayout.setTag(date);
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String dateTime = simpleDateFormat.format(date);
+            viewHolderChild.linearLayout.setTag(dateTime);
 
             days1 = days1 + 1;
             date.setDate(days1);
@@ -347,6 +341,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
                 ViewHolderChild viewHolderChild = viewHolderChildList.get(j);
                 viewHolderChild.textViewDay.setText(" ");
                 viewHolderChild.textViewLunar.setText(" ");
+                viewHolderChild.linearLayout.setTag(null);
             }
         }
     }
@@ -386,9 +381,9 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
     @Override
     public void onClick(View v) {
-        Date date = (Date) v.getTag();
-        if (date != null && clickDateListener != null) {
-            clickDateListener.clickDate(date.getTime());
+        String formatterTime = (String) v.getTag();
+        if (formatterTime != null && clickDateListener != null) {
+            clickDateListener.clickDate(formatterTime);
         }
     }
 
@@ -407,7 +402,11 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
      * 点击日期监听接口
      */
     public interface ClickDateListener {
-        public void clickDate(long mills);
+        /**
+         * yyyy-MM-dd HH:mm:ss
+         * @param formatterTime
+         */
+        public void clickDate(String formatterTime);
     }
 
     private class CalendarUtil {
