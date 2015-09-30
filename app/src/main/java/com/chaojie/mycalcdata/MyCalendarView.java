@@ -58,7 +58,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
     private final int ONE_WEEK = 7;
     private final int WEEKS = 6;
 
-    private final float INTERVAL_X = 50;
+    private final float INTERVAL_X = 30;
 
     public MyCalendarView(Context context) {
         super(context);
@@ -215,6 +215,8 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
                 viewHolderChild.linearLayout.setId(i * ONE_WEEK + (j + 1));
                 viewHolderChild.linearLayout.setOnClickListener(this);//设置点击日期监听事件
+                viewHolderChild.linearLayout.setOnTouchListener(this);
+                viewHolder.linearLayoutMain.setOnTouchListener(this);
             }
 
             /**设置添加一条一周日期栏底部横线样式 start**/
@@ -376,7 +378,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
                 initCalendarDays(currentYear, currentMonth);
             }
         }
-        return false;
+        return true;
     }
 
     @Override
