@@ -46,6 +46,8 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
     /**当前显示的月份**/
     private int currentMonth;
+    /**当前显示的年份**/
+    private int currentYear;
 
     /**农历时间工具**/
     private CalendarUtil calendarUtil;
@@ -95,11 +97,10 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         /**设置主布局样式 end**/
 
         Date date = new Date();
-        String topTitle = (date.getYear() + 1900) + "年" + (date.getMonth() + 1) + "月";
 
         /**设置顶部显示年月样式 start**/
         textViewTop = new TextView(context);
-        textViewTop.setText(topTitle);
+        textViewTop.setText(getTopTitle(date));
         textViewTop.setTextColor(getResources().getColor(android.R.color.black));
         LayoutParams layoutParamsTop = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         layoutParamsTop.setMargins(0, MARGIN_TOP, 0, 0);
@@ -236,6 +237,11 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         initCalendarDays(date.getYear(), date.getMonth());//初始化显示当月的数据
     }
 
+    private String getTopTitle(Date date) {
+        String topTitle = (date.getYear() + 1900) + "年" + (date.getMonth() + 1) + "月";
+        return topTitle;
+    }
+
     /**
      * 根据index获取星期几
      * @param index
@@ -279,7 +285,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
      * @param year
      * @param month
      */
-    private void initCalendarDays(int year, int month) {
+    public void initCalendarDays(int year, int month) {
         clear();
 
         Date date = new Date();
@@ -307,6 +313,9 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
             }
             viewHolderChild.textViewDay.setText(daysStr);
             String lunar = calendarUtil.getChineseDay(date.getYear() + 1900, date.getMonth() + 1, date.getDate());
+            if (lunar.length() == 1) {
+                lunar = " " + lunar;
+            }
             viewHolderChild.textViewLunar.setText(lunar);
 
             days1 = days1 + 1;
@@ -314,6 +323,8 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
             startIndex++;
         }
+        currentMonth = month;
+        currentYear = year;
     }
 
     /**
@@ -387,8 +398,8 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         private String monthOfAlmanac[] = {"正月","二月","三月","四月","五月","六月","七月","八月","九月","十月","冬月","腊月"};
         private String daysOfAlmanac[] = { "初一", "初二", "初三", "初四", "初五", "初六",
                 "初七", "初八", "初九", "初十", "十一", "十二", "十三", "十四", "十五", "十六", "十七",
-                "十八", "十九", "二十", "廿一", "廿二", "廿三", "廿四", "廿五", "廿六", "廿七", "廿八",
-                "廿九", "三十" }; // 农历的天数
+                "十八", "十九", "廿", "廿一", "廿二", "廿三", "廿四", "廿五", "廿六", "廿七", "廿八",
+                "廿九", "卅" }; // 农历的天数
 
         public CalendarUtil() {
             setGregorian(1901, 1, 1);
