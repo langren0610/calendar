@@ -47,10 +47,15 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
     /**当前显示的月份**/
     private int currentMonth;
 
+    /**农历时间工具**/
+    private CalendarUtil calendarUtil;
+
     private final int MARGIN_TOP = 20;
     private final int MARGIN_BOTTOM = 20;
     private final int MARGIN_LEFT = 30;
     private final int MARGIN_RIGHT = 30;
+
+    private final int MARGIN_LITTLE = 5;
 
     private final int TEXT_TOP_SIZE = 18;
     private final int TEXT_DAY = 20;
@@ -79,6 +84,8 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
     }
 
     private void init(Context context) {
+        calendarUtil = new CalendarUtil();
+
         /**设置主布局样式 start**/
         linearLayoutMain = new LinearLayout(mContext);
         LayoutParams layoutParamsMian = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
@@ -181,7 +188,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
                 /**设置一个日期布局样式 start**/
                 LayoutParams layoutParams3 = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
                 layoutParams3.weight = 1;
-                layoutParams3.setMargins(MARGIN_LEFT, MARGIN_TOP, MARGIN_RIGHT, MARGIN_BOTTOM);
+                layoutParams3.setMargins(MARGIN_LEFT, MARGIN_LITTLE, MARGIN_RIGHT, 0);
 
                 ViewHolderChild viewHolderChild = new ViewHolderChild();
                 viewHolderChild.linearLayout = new LinearLayout(mContext);
@@ -199,6 +206,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
                 viewHolderChild.textViewDay.setTextSize(TEXT_DAY);
                 viewHolderChild.textViewDay.setLayoutParams(layoutParamsText);
 
+                layoutParamsText.setMargins(0, MARGIN_LITTLE, 0, 0);
                 viewHolderChild.textViewLunar = new TextView(mContext);
                 viewHolderChild.textViewLunar.setText("");
                 viewHolderChild.textViewLunar.setTextSize(TEXT_DAY - 8);
@@ -298,6 +306,9 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
                 daysStr = " " + daysStr;
             }
             viewHolderChild.textViewDay.setText(daysStr);
+            String lunar = calendarUtil.getChineseDay(date.getYear() + 1900, date.getMonth() + 1, date.getDate());
+            viewHolderChild.textViewLunar.setText(lunar);
+
             days1 = days1 + 1;
             date.setDate(days1);
 
