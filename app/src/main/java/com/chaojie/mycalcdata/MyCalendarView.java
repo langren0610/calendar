@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Created by chaojie on 2015/9/28.
  */
-public class MyCalendarView extends LinearLayout implements View.OnTouchListener {
+public class MyCalendarView extends LinearLayout implements View.OnTouchListener, View.OnClickListener {
 
     /**顶部年月显示**/
     private TextView textViewTop;
@@ -51,6 +51,8 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
     /**农历时间工具**/
     private CalendarUtil calendarUtil;
+    /**点击日期监听接口**/
+    private ClickDateListener clickDateListener;
 
     private final int MARGIN_TOP = 20;
     private final int MARGIN_BOTTOM = 20;
@@ -60,7 +62,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
     private final int MARGIN_LITTLE = 5;
 
     private final int TEXT_TOP_SIZE = 18;
-    private final int TEXT_DAY = 20;
+    private final int TEXT_DAY = 16;
 
     private final int ONE_WEEK = 7;
     private final int WEEKS = 6;
@@ -207,7 +209,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
                 viewHolderChild.textViewDay.setTextSize(TEXT_DAY);
                 viewHolderChild.textViewDay.setLayoutParams(layoutParamsText);
 
-                layoutParamsText.setMargins(0, MARGIN_LITTLE, 0, 0);
+                layoutParamsText.setMargins(0, 10, 0, 0);
                 viewHolderChild.textViewLunar = new TextView(mContext);
                 viewHolderChild.textViewLunar.setText("");
                 viewHolderChild.textViewLunar.setTextSize(TEXT_DAY - 8);
@@ -219,6 +221,8 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
                 viewHolder.linearLayoutMain.addView(viewHolderChild.linearLayout);//将日期布局添加到一周日期栏布局中
                 viewHolder.viewHolderChildList.add(viewHolderChild);//将一周日期栏布局添加到日期主布局中
+
+                viewHolderChild.linearLayout.setOnClickListener(this);//设置点击日期监听事件
             }
 
             /**设置添加一条一周日期栏底部横线样式 start**/
@@ -293,6 +297,9 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         date.setMonth(month);
         date.setDate(1);
 
+        String topTitle = getTopTitle(date);
+        textViewTop.setText(topTitle);//显示当前的年月到顶部标题
+
         int days = getMonthDays(date);
         int day = date.getDay();
         int startIndex = day;
@@ -318,6 +325,8 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
             }
             viewHolderChild.textViewLunar.setText(lunar);
 
+            viewHolderChild.linearLayout.setTag(date);
+
             days1 = days1 + 1;
             date.setDate(days1);
 
@@ -342,6 +351,11 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         }
     }
 
+    /**设置点击日期监听接口**/
+    public void setOnClickDateListener(ClickDateListener clickDateListener) {
+        this.clickDateListener = clickDateListener;
+    }
+
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         int action = event.getAction();
@@ -350,12 +364,32 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         } else if (action == MotionEvent.ACTION_UP) {
             float motionEventUpX = event.getX();
             if (motionEventUpX >= (motionEventDownX - INTERVAL_X)) {//turn righr
-
+                if (currentMonth <= 0) {//如果当前显示的一经是一月份,则将当前月份置为11月,年份减一年
+                    currentMonth = 11;
+                    currentYear = currentYear - 1;
+                } else {//如果当前显示的月份不是一月，则显示上一个月份日期
+                    currentMonth = currentMonth - 1;
+                }
+                initCalendarDays(currentYear, currentMonth);
             } else if (motionEventUpX <= (motionEventDownX - INTERVAL_X)) {//turn left
-
+                if (currentMonth >= 11) {//如果当前显示的一经是十二月份,则将当前月份置为1月,年份加一年
+                    currentMonth = 0;
+                    currentYear = currentYear + 1;
+                } else {//如果当前显示的月份不是十二月，则显示下一个月份日期
+                    currentMonth = currentMonth + 1;
+                }
+                initCalendarDays(currentYear, currentMonth);
             }
         }
         return false;
+    }
+
+    @Override
+    public void onClick(View v) {
+        Date date = (Date) v.getTag();
+        if (date != null && clickDateListener != null) {
+            clickDateListener.clickDate(date.getTime());
+        }
     }
 
     private class ViewHolder {
@@ -367,6 +401,13 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         public LinearLayout linearLayout;
         public TextView textViewDay;
         public TextView textViewLunar;
+    }
+
+    /**
+     * 点击日期监听接口
+     */
+    public interface ClickDateListener {
+        public void clickDate(long mills);
     }
 
     private class CalendarUtil {

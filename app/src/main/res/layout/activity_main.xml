@@ -14,6 +14,7 @@
         android:layout_alignParentEnd="true" />-->
 
     <com.chaojie.mycalcdata.MyCalendarView
+        android:id="@+id/mycalendrview"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

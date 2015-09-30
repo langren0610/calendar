@@ -2,42 +2,34 @@ package com.chaojie.mycalcdata;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CalendarView;
 
-public class MainActivity extends AppCompatActivity {
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 
-    //private CalendarView calendarView;
+public class MainActivity extends AppCompatActivity implements MyCalendarView.ClickDateListener {
+
+    private MyCalendarView myCalendarView;
+
+    private final String TAG = MainActivity.class.getName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /*calendarView = (CalendarView) findViewById(R.id.calendarView);
-        calendarView.setContentDescription("fdsfsdfdsfd");*/
+        myCalendarView = (MyCalendarView) findViewById(R.id.mycalendrview);
+        myCalendarView.setOnClickDateListener(this);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+    public void clickDate(long mills) {
+        Timestamp timestamp = new Timestamp(mills);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Log.i(TAG, "clickDate time[" + simpleDateFormat.format(timestamp) +  "]");
     }
 }
