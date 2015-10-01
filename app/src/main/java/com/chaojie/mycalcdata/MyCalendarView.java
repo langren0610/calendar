@@ -1,11 +1,19 @@
 package com.chaojie.mycalcdata;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -44,6 +52,11 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
     private CalendarUtil calendarUtil;
     /**点击日期监听接口**/
     private ClickDateListener clickDateListener;
+    /**今天时间背景**/
+    private Drawable drawableCurrentDayBg;
+    /**画笔**/
+    private Canvas canvas;
+    private Bitmap copy;
 
     private final int MARGIN_TOP = 20;
     private final int MARGIN_BOTTOM = 20;
@@ -75,7 +88,16 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
     public MyCalendarView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         mContext = context;
+        initCanvas();
         init(context);
+    }
+
+    private void initCanvas() {
+        copy = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
+        canvas = new Canvas(copy);
+        //canvas.drawCircle();
+        //Paint paint = new Paint(canvas);
+        //drawableCurrentDayBg = new Dra
     }
 
     private void init(Context context) {
@@ -121,6 +143,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         /**设置显示星期布局样式 end**/
 
         /**设置星期样式 start**/
+        Drawable drawable =new BitmapDrawable(copy);
         for (int i = 0; i < ONE_WEEK; ++i) {
             /**设置星期布局样式 start**/
             LinearLayout linearLayoutChild = new LinearLayout(mContext);
@@ -140,7 +163,6 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
             /**设置显示星期的textView样式 end**/
 
             linearLayoutChild.addView(textView);//将显示星期的textview添加到相应的星期布局中
-
             linearLayoutWeek.addView(linearLayoutChild);//将星期布局添加到星期布局栏中
         }
         /**设置星期样式 start**/
@@ -215,7 +237,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
                 viewHolderChild.linearLayout.setId(i * ONE_WEEK + (j + 1));
                 viewHolderChild.linearLayout.setOnClickListener(this);//设置点击日期监听事件
-                viewHolderChild.linearLayout.setOnTouchListener(this);
+                //viewHolderChild.linearLayout.setOnTouchListener(this);
                 viewHolder.linearLayoutMain.setOnTouchListener(this);
             }
 
@@ -360,7 +382,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
             motionEventDownX = event.getX();
         } else if (action == MotionEvent.ACTION_UP) {
             float motionEventUpX = event.getX();
-            if (motionEventUpX >= (motionEventDownX - INTERVAL_X)) {//turn righr
+            if ((motionEventUpX - motionEventDownX) >= INTERVAL_X) {//turn righr
                 if (currentMonth <= 0) {//如果当前显示的一经是一月份,则将当前月份置为11月,年份减一年
                     currentMonth = 11;
                     currentYear = currentYear - 1;
@@ -368,7 +390,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
                     currentMonth = currentMonth - 1;
                 }
                 initCalendarDays(currentYear, currentMonth);
-            } else if (motionEventUpX <= (motionEventDownX - INTERVAL_X)) {//turn left
+            } else if ((motionEventDownX - motionEventUpX) >= INTERVAL_X) {//turn left
                 if (currentMonth >= 11) {//如果当前显示的一经是十二月份,则将当前月份置为1月,年份加一年
                     currentMonth = 0;
                     currentYear = currentYear + 1;
