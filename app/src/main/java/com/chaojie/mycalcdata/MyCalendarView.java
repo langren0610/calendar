@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
@@ -54,6 +55,8 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
     private ClickDateListener clickDateListener;
     /**今天时间背景**/
     private Drawable drawableCurrentDayBg;
+    /**平常日期背景**/
+    private Drawable drawableNormal;
     /**画笔**/
     private Canvas canvas;
     private Bitmap bitmap;
@@ -89,7 +92,6 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
     public MyCalendarView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         mContext = context;
-        initCanvas();
         init(context);
     }
 
@@ -97,13 +99,15 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
         canvas = new Canvas(bitmap);
         paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setColor(Color.BLUE);
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(10);
-        canvas.drawCircle(110,150,60,paint);
-        //canvas.drawCircle();
-        //Paint paint = new Paint(canvas);
-        //drawableCurrentDayBg = new Dra
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.rgb(50, 192, 196));
+        paint.setAntiAlias(true);
+        paint.setStrokeWidth(2);
+        canvas.drawCircle(50, 50, 50, paint);
+        drawableCurrentDayBg = new BitmapDrawable(bitmap);
+
+        Bitmap bitmapNormal = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
+        drawableNormal = new BitmapDrawable(bitmapNormal);
     }
 
     private void init(Context context) {
@@ -191,6 +195,8 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         linearLayoutChild.setLayoutParams(layoutParamsChild);
         linearLayoutMain.addView(linearLayoutChild);
         /**设置显示日期的布局样式 end**/
+
+        initCanvas();//初始化画板画笔
 
         /**设置日期布局样式 start**/
         for (int i = 0; i < WEEKS; ++i) {
@@ -313,6 +319,8 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
      */
     public void initCalendarDays(int year, int month) {
         clear();
+        Date todayDate = new Date();
+        int today = todayDate.getDate();//当天的日期
 
         Date date = new Date();
         date.setYear(year);
@@ -360,6 +368,13 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
             String dateTime = simpleDateFormat.format(date);
             viewHolderChild.linearLayout.setTag(dateTime);
 
+            if (days1 == today) {
+                viewHolderChild.textViewDay.setBackgroundDrawable(drawableCurrentDayBg);
+                viewHolderChild.textViewDay.setTextColor(Color.WHITE);
+            } else {
+                viewHolderChild.textViewDay.setBackgroundDrawable(drawableNormal);
+                viewHolderChild.textViewDay.setTextColor(Color.BLACK);
+            }
             days1 = days1 + 1;
             date.setDate(days1);
 
@@ -381,6 +396,8 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
                 viewHolderChild.textViewDay.setText(" ");
                 viewHolderChild.textViewLunar.setText(" ");
                 viewHolderChild.linearLayout.setTag(null);
+                viewHolderChild.textViewDay.setBackgroundDrawable(drawableNormal);
+                viewHolderChild.textViewLunar.setTextColor(Color.BLACK);
             }
         }
     }
