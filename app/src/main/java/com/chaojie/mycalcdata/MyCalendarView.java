@@ -56,7 +56,8 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
     private Drawable drawableCurrentDayBg;
     /**画笔**/
     private Canvas canvas;
-    private Bitmap copy;
+    private Bitmap bitmap;
+    private Paint paint;
 
     private final int MARGIN_TOP = 20;
     private final int MARGIN_BOTTOM = 20;
@@ -93,8 +94,13 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
     }
 
     private void initCanvas() {
-        copy = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
-        canvas = new Canvas(copy);
+        bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
+        canvas = new Canvas(bitmap);
+        paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setColor(Color.BLUE);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(10);
+        canvas.drawCircle(110,150,60,paint);
         //canvas.drawCircle();
         //Paint paint = new Paint(canvas);
         //drawableCurrentDayBg = new Dra
@@ -143,7 +149,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         /**设置显示星期布局样式 end**/
 
         /**设置星期样式 start**/
-        Drawable drawable =new BitmapDrawable(copy);
+        Drawable drawable = new BitmapDrawable(bitmap);
         for (int i = 0; i < ONE_WEEK; ++i) {
             /**设置星期布局样式 start**/
             LinearLayout linearLayoutChild = new LinearLayout(mContext);
@@ -335,11 +341,20 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
                 daysStr = " " + daysStr;
             }
             viewHolderChild.textViewDay.setText(daysStr);
+
+            String chinesMonth = null;
             String lunar = calendarUtil.getChineseDay(date.getYear() + 1900, date.getMonth() + 1, date.getDate());
+            if (lunar.equals(calendarUtil.getChineseDay(0))) {
+                chinesMonth = calendarUtil.getChineseMonth(date.getYear() + 1900, date.getMonth() + 1, date.getDate());
+            }
             if (lunar.length() == 1) {
                 lunar = " " + lunar;
             }
-            viewHolderChild.textViewLunar.setText(lunar);
+            if (chinesMonth != null && !chinesMonth.isEmpty()) {
+                viewHolderChild.textViewLunar.setText(chinesMonth);
+            } else {
+                viewHolderChild.textViewLunar.setText(lunar);
+            }
 
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String dateTime = simpleDateFormat.format(date);
@@ -483,6 +498,15 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
             c.computeSolarTerms();
             int cd = c.getChineseDate();
             return daysOfAlmanac[cd - 1];
+        }
+
+        /**
+         * 获取农历的某一天
+         * @param index
+         * @return
+         */
+        public String getChineseDay(int index) {
+            return daysOfAlmanac[index];
         }
 
         /**
