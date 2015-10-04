@@ -116,6 +116,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
         Bitmap bitmapClick = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
         paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(10);
         canvas.setBitmap(bitmapClick);
         canvas.drawCircle(50, 50, 50, paint);
         drawableClickBg = new BitmapDrawable(bitmapClick);
@@ -414,6 +415,9 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
                 viewHolderChild.linearLayout.setBackgroundDrawable(drawableNormal);
             }
         }
+        if (lastClickView != null) {
+            lastClickView.setBackgroundDrawable(drawableNormal);
+        }
     }
 
     /**设置点击日期监听接口**/
@@ -456,8 +460,9 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
             if (lastClickView != null) {
                 lastClickView.setBackgroundDrawable(drawableNormal);
             }
-            v.setBackgroundDrawable(drawableClickBg);
-            lastClickView = v;
+            TextView textView =  (TextView)((ViewGroup) v).getChildAt(0);
+            textView.setBackgroundDrawable(drawableClickBg);
+            lastClickView = textView;
             clickDateListener.clickDate(formatterTime);
         }
     }
