@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -57,6 +58,10 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
     private Drawable drawableCurrentDayBg;
     /**平常日期背景**/
     private Drawable drawableNormal;
+    /**点击日期背景**/
+    private Drawable drawableClickBg;
+    /***上次点击的view**/
+    private View lastClickView;
     /**画笔**/
     private Canvas canvas;
     private Bitmap bitmap;
@@ -108,6 +113,12 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
         Bitmap bitmapNormal = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
         drawableNormal = new BitmapDrawable(bitmapNormal);
+
+        Bitmap bitmapClick = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
+        paint.setStyle(Paint.Style.STROKE);
+        canvas.setBitmap(bitmapClick);
+        canvas.drawCircle(50, 50, 50, paint);
+        drawableClickBg = new BitmapDrawable(bitmapClick);
     }
 
     private void init(Context context) {
@@ -203,7 +214,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
             /**设置一周日期栏主句样式 start**/
             ViewHolder viewHolder = new ViewHolder();
             viewHolder.linearLayoutMain = new LinearLayout(mContext);
-            LayoutParams layoutParams2 = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+            LayoutParams layoutParams2 = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 
             viewHolder.linearLayoutMain.setOrientation(HORIZONTAL);
             viewHolder.linearLayoutMain.setLayoutParams(layoutParams2);
@@ -225,8 +236,8 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
                 /**设置一个日期布局样式 end**/
 
                 /**设置显示日期的textview start**/
-                LayoutParams layoutParamsText = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-                layoutParamsText.weight = 1;
+                LayoutParams layoutParamsText = new LayoutParams(50, 50);
+                //layoutParamsText.weight = 9;
                 layoutParamsText.gravity = Gravity.CENTER;
 
                 viewHolderChild.textViewDay = new TextView(mContext);
@@ -234,7 +245,9 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
                 viewHolderChild.textViewDay.setTextSize(TEXT_DAY);
                 viewHolderChild.textViewDay.setLayoutParams(layoutParamsText);
 
+                layoutParamsText = new LayoutParams(50, ViewGroup.LayoutParams.WRAP_CONTENT);
                 layoutParamsText.setMargins(0, 10, 0, 0);
+                //layoutParamsText.weight = 5;
                 viewHolderChild.textViewLunar = new TextView(mContext);
                 viewHolderChild.textViewLunar.setText("");
                 viewHolderChild.textViewLunar.setTextSize(TEXT_DAY - 8);
@@ -398,6 +411,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
                 viewHolderChild.linearLayout.setTag(null);
                 viewHolderChild.textViewDay.setBackgroundDrawable(drawableNormal);
                 viewHolderChild.textViewLunar.setTextColor(Color.BLACK);
+                viewHolderChild.linearLayout.setBackgroundDrawable(drawableNormal);
             }
         }
     }
@@ -439,6 +453,11 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
     public void onClick(View v) {
         String formatterTime = (String) v.getTag();
         if (formatterTime != null && clickDateListener != null) {
+            if (lastClickView != null) {
+                lastClickView.setBackgroundDrawable(drawableNormal);
+            }
+            v.setBackgroundDrawable(drawableClickBg);
+            lastClickView = v;
             clickDateListener.clickDate(formatterTime);
         }
     }
