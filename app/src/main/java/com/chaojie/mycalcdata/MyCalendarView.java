@@ -82,6 +82,15 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
     private final float INTERVAL_X = 30;
 
+    private final int TEXTVIEW_HEIGHT = 50;
+
+    /***设置选中的日期年份**/
+    private int selectYear = 0;
+    /***设置选中的日期月份**/
+    private int selectMOnth = 0;
+    /***设置选中的日期天**/
+    private int selectDay = 0;
+
     public MyCalendarView(Context context) {
         super(context);
         mContext = context;
@@ -237,7 +246,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
                 /**设置一个日期布局样式 end**/
 
                 /**设置显示日期的textview start**/
-                LayoutParams layoutParamsText = new LayoutParams(50, 50);
+                LayoutParams layoutParamsText = new LayoutParams(TEXTVIEW_HEIGHT, TEXTVIEW_HEIGHT);
                 //layoutParamsText.weight = 9;
                 layoutParamsText.gravity = Gravity.CENTER;
 
@@ -246,7 +255,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
                 viewHolderChild.textViewDay.setTextSize(TEXT_DAY);
                 viewHolderChild.textViewDay.setLayoutParams(layoutParamsText);
 
-                layoutParamsText = new LayoutParams(50, ViewGroup.LayoutParams.WRAP_CONTENT);
+                layoutParamsText = new LayoutParams(TEXTVIEW_HEIGHT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 layoutParamsText.setMargins(0, 10, 0, 0);
                 //layoutParamsText.weight = 5;
                 viewHolderChild.textViewLunar = new TextView(mContext);
@@ -389,6 +398,12 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
                 viewHolderChild.textViewDay.setBackgroundDrawable(drawableNormal);
                 viewHolderChild.textViewDay.setTextColor(Color.BLACK);
             }
+
+            if (selectYear == (date.getYear() + 1900) && selectMOnth == (date.getMonth() + 1) && selectDay == date.getDate()) {
+                viewHolderChild.textViewDay.setBackgroundDrawable(drawableClickBg);
+                lastClickView = viewHolderChild.textViewDay;
+            }
+
             days1 = days1 + 1;
             date.setDate(days1);
 
@@ -418,6 +433,19 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         if (lastClickView != null) {
             lastClickView.setBackgroundDrawable(drawableNormal);
         }
+    }
+
+    /**
+     * 设置选中的日期
+     * @param year
+     * @param month 1月到12月
+     * @param day
+     */
+    public void setSelectDate(int year, int month, int day) {
+        selectYear = year;
+        selectMOnth = month;
+        selectDay = day;
+        initCalendarDays(currentYear, currentMonth);
     }
 
     /**设置点击日期监听接口**/
