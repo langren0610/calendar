@@ -82,7 +82,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
     private final float INTERVAL_X = 30;
 
-    private final int TEXTVIEW_HEIGHT = 50;
+    private final int TEXTVIEW_HEIGHT = 40;
 
     /***设置选中的日期年份**/
     private int selectYear = 0;
@@ -125,9 +125,9 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
         Bitmap bitmapClick = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(10);
+        paint.setStrokeWidth(20);
         canvas.setBitmap(bitmapClick);
-        canvas.drawCircle(50, 50, 50, paint);
+        canvas.drawCircle(50, 50, 40, paint);
         drawableClickBg = new BitmapDrawable(bitmapClick);
     }
 
@@ -190,6 +190,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
             layoutParams2.gravity = Gravity.CENTER;
             layoutParams2.setMargins(MARGIN_LEFT, MARGIN_TOP, MARGIN_RIGHT, MARGIN_BOTTOM);
             textView.setText(getWeekDay(i));
+            textView.setGravity(Gravity.CENTER);
             textView.setLayoutParams(layoutParams2);
             /**设置显示星期的textView样式 end**/
 
@@ -224,7 +225,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
             /**设置一周日期栏主句样式 start**/
             ViewHolder viewHolder = new ViewHolder();
             viewHolder.linearLayoutMain = new LinearLayout(mContext);
-            LayoutParams layoutParams2 = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+            LayoutParams layoutParams2 = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
 
             viewHolder.linearLayoutMain.setOrientation(HORIZONTAL);
             viewHolder.linearLayoutMain.setLayoutParams(layoutParams2);
@@ -236,7 +237,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
             for (int j = 0; j < ONE_WEEK; ++j) {
                 /**设置一个日期布局样式 start**/
                 LayoutParams layoutParams3 = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-                layoutParams3.weight = 1;
+                layoutParams3.weight = 3;
                 layoutParams3.setMargins(MARGIN_LEFT, MARGIN_LITTLE, MARGIN_RIGHT, 0);
 
                 ViewHolderChild viewHolderChild = new ViewHolderChild();
@@ -248,11 +249,11 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
                 /**设置显示日期的textview start**/
                 LayoutParams layoutParamsText = new LayoutParams(TEXTVIEW_HEIGHT, TEXTVIEW_HEIGHT);
                 //layoutParamsText.weight = 9;
-                layoutParamsText.gravity = Gravity.CENTER;
 
                 viewHolderChild.textViewDay = new TextView(mContext);
                 viewHolderChild.textViewDay.setText("");
                 viewHolderChild.textViewDay.setTextSize(TEXT_DAY);
+                viewHolderChild.textViewDay.setGravity(Gravity.CENTER);
                 viewHolderChild.textViewDay.setLayoutParams(layoutParamsText);
 
                 layoutParamsText = new LayoutParams(TEXTVIEW_HEIGHT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -261,6 +262,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
                 viewHolderChild.textViewLunar = new TextView(mContext);
                 viewHolderChild.textViewLunar.setText("");
                 viewHolderChild.textViewLunar.setTextSize(TEXT_DAY - 8);
+                viewHolderChild.textViewLunar.setGravity(Gravity.CENTER);
                 viewHolderChild.textViewLunar.setLayoutParams(layoutParamsText);
                 /**设置显示日期的textview end**/
 
@@ -368,9 +370,9 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
             int days1 = date.getDate();
             String daysStr = String.valueOf(days1);
-            if (days1 < 10) {
-                daysStr = " " + daysStr;
-            }
+//            if (days1 < 10) {
+//                daysStr = " " + daysStr;
+//            }
             viewHolderChild.textViewDay.setText(daysStr);
 
             String chinesMonth = null;
@@ -378,9 +380,9 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
             if (lunar.equals(calendarUtil.getChineseDay(0))) {
                 chinesMonth = calendarUtil.getChineseMonth(date.getYear() + 1900, date.getMonth() + 1, date.getDate());
             }
-            if (lunar.length() == 1) {
-                lunar = " " + lunar;
-            }
+//            if (lunar.length() == 1) {
+//                lunar = " " + lunar;
+//            }
             if (chinesMonth != null && !chinesMonth.isEmpty()) {
                 viewHolderChild.textViewLunar.setText(chinesMonth);
             } else {
