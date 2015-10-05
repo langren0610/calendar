@@ -91,6 +91,8 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
     /***设置选中的日期天**/
     private int selectDay = 0;
 
+    private final String LOG = MyCalendarView.class.getName();
+
     public MyCalendarView(Context context) {
         super(context);
         mContext = context;
@@ -370,24 +372,20 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
             int days1 = date.getDate();
             String daysStr = String.valueOf(days1);
-//            if (days1 < 10) {
-//                daysStr = " " + daysStr;
-//            }
             viewHolderChild.textViewDay.setText(daysStr);
 
+            /***获取农历日期 start***/
             String chinesMonth = null;
             String lunar = calendarUtil.getChineseDay(date.getYear() + 1900, date.getMonth() + 1, date.getDate());
             if (lunar.equals(calendarUtil.getChineseDay(0))) {
                 chinesMonth = calendarUtil.getChineseMonth(date.getYear() + 1900, date.getMonth() + 1, date.getDate());
             }
-//            if (lunar.length() == 1) {
-//                lunar = " " + lunar;
-//            }
             if (chinesMonth != null && !chinesMonth.isEmpty()) {
                 viewHolderChild.textViewLunar.setText(chinesMonth);
             } else {
                 viewHolderChild.textViewLunar.setText(lunar);
             }
+            /***获取农历日期 start***/
 
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String dateTime = simpleDateFormat.format(date);
@@ -406,6 +404,23 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
                 lastClickView = viewHolderChild.textViewDay;
             }
 
+            /***获取二十四节气 start***/
+            try {
+                int month1 = date.getMonth();
+                if (month1 == 0) {
+                    month1 = 12;
+                }
+                calendarUtil.setGregorian(date.getYear() + 1900, month1, date.getDate());
+                calendarUtil.computeChineseFields();
+                calendarUtil.computeSolarTerms();
+                String chilneseDate = calendarUtil.getDateString();
+                if (chilneseDate != null && !chilneseDate.isEmpty()) {
+                    viewHolderChild.textViewLunar.setText(chilneseDate);
+                }
+            } catch (Exception e) {
+                Log.e(LOG, "get chinese date error!", e);
+            }
+            /***获取二十四节气 end***/
             days1 = days1 + 1;
             date.setDate(days1);
 
@@ -597,6 +612,52 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
             if(cd < 1 || cd > 29)
                 cd = 1;
             return monthOfAlmanac[cd -1];
+        }
+
+        /**
+         * 获取农历月份
+         * @param chineseMonth
+         * @return
+         */
+        public int getChineseMonth(String chineseMonth) {
+            int month = -1;
+            if (chineseMonth.equals(monthOfAlmanac[0])) {
+                month = 1;
+            }
+            if (chineseMonth.equals(monthOfAlmanac[1])) {
+                month = 2;
+            }
+            if (chineseMonth.equals(monthOfAlmanac[2])) {
+                month = 3;
+            }
+            if (chineseMonth.equals(monthOfAlmanac[3])) {
+                month = 4;
+            }
+            if (chineseMonth.equals(monthOfAlmanac[4])) {
+                month = 5;
+            }
+            if (chineseMonth.equals(monthOfAlmanac[5])) {
+                month = 6;
+            }
+            if (chineseMonth.equals(monthOfAlmanac[6])) {
+                month = 7;
+            }
+            if (chineseMonth.equals(monthOfAlmanac[7])) {
+                month = 8;
+            }
+            if (chineseMonth.equals(monthOfAlmanac[8])) {
+                month = 9;
+            }
+            if (chineseMonth.equals(monthOfAlmanac[9])) {
+                month = 10;
+            }
+            if (chineseMonth.equals(monthOfAlmanac[10])) {
+                month = 11;
+            }
+            if (chineseMonth.equals(monthOfAlmanac[11])) {
+                month = 12;
+            }
+            return month;
         }
 
         public void setGregorian(int y, int m, int d) {
@@ -1042,7 +1103,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
                 "芒种", "小暑", "立秋", "白露", "寒露", "立冬", "大雪", "小寒" };
 
         public String getDateString() {
-            String str = "*  /  ";
+            String str = "";
             String gm = String.valueOf(gregorianMonth);
             if (gm.length() == 1)
                 gm = ' ' + gm;
@@ -1059,13 +1120,13 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
                 str = " " + sectionalTermNames[gregorianMonth - 1];
             } else if (gregorianDate == principleTerm) {
                 str = " " + principleTermNames[gregorianMonth - 1];
-            } else if (chineseDate == 1 && chineseMonth > 0) {
-                str = " " + chineseMonthNames[chineseMonth - 1] + "月";
+            } /*else if (chineseDate == 1 && chineseMonth > 0) {
+                str = " " + chineseMonthNames[chineseMonth] + "月";
             } else if (chineseDate == 1 && chineseMonth < 0) {
                 str = "*" + chineseMonthNames[-chineseMonth - 1] + "月";
             } else {
                 str = gd + '/' + cd;
-            }
+            }*/
             return str;
         }
 
@@ -1190,7 +1251,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         }
 
         public void setDaysInGregorianMonth(char[] daysInGregorianMonth) {
-            daysInGregorianMonth = daysInGregorianMonth;
+            this.daysInGregorianMonth = daysInGregorianMonth;
         }
 
         public String[] getStemNames() {
@@ -1198,7 +1259,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         }
 
         public void setStemNames(String[] stemNames) {
-            stemNames = stemNames;
+            this.stemNames = stemNames;
         }
 
         public String[] getBranchNames() {
@@ -1206,7 +1267,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         }
 
         public void setBranchNames(String[] branchNames) {
-            branchNames = branchNames;
+            this.branchNames = branchNames;
         }
 
         public String[] getAnimalNames() {
@@ -1214,7 +1275,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         }
 
         public void setAnimalNames(String[] animalNames) {
-            animalNames = animalNames;
+            this.animalNames = animalNames;
         }
 
         public char[] getChineseMonths() {
@@ -1222,7 +1283,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         }
 
         public void setChineseMonths(char[] chineseMonths) {
-            chineseMonths = chineseMonths;
+            this.chineseMonths = chineseMonths;
         }
 
         public int getBaseYear() {
@@ -1231,7 +1292,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
 
         public void setBaseYear(int baseYear) {
-            baseYear = baseYear;
+            this.baseYear = baseYear;
         }
 
         public int getBaseMonth() {
@@ -1239,7 +1300,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         }
 
         public void setBaseMonth(int baseMonth) {
-            baseMonth = baseMonth;
+            this.baseMonth = baseMonth;
         }
 
         public int getBaseDate() {
@@ -1247,7 +1308,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         }
 
         public void setBaseDate(int baseDate) {
-            baseDate = baseDate;
+            this.baseDate = baseDate;
         }
 
         public int getBaseIndex() {
@@ -1255,7 +1316,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         }
 
         public void setBaseIndex(int baseIndex) {
-            baseIndex = baseIndex;
+            this.baseIndex = baseIndex;
         }
 
         public int getBaseChineseYear() {
@@ -1263,7 +1324,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         }
 
         public void setBaseChineseYear(int baseChineseYear) {
-            baseChineseYear = baseChineseYear;
+            this.baseChineseYear = baseChineseYear;
         }
 
         public int getBaseChineseMonth() {
@@ -1271,7 +1332,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         }
 
         public void setBaseChineseMonth(int baseChineseMonth) {
-            baseChineseMonth = baseChineseMonth;
+            this.baseChineseMonth = baseChineseMonth;
         }
 
         public int getBaseChineseDate() {
@@ -1279,7 +1340,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         }
 
         public void setBaseChineseDate(int baseChineseDate) {
-            baseChineseDate = baseChineseDate;
+            this.baseChineseDate = baseChineseDate;
         }
 
         public int[] getBigLeapMonthYears() {
@@ -1287,7 +1348,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         }
 
         public void setBigLeapMonthYears(int[] bigLeapMonthYears) {
-            bigLeapMonthYears = bigLeapMonthYears;
+            this.bigLeapMonthYears = bigLeapMonthYears;
         }
 
         public char[][] getSectionalTermMap() {
@@ -1295,7 +1356,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         }
 
         public void setSectionalTermMap(char[][] sectionalTermMap) {
-            sectionalTermMap = sectionalTermMap;
+            this.sectionalTermMap = sectionalTermMap;
         }
 
         public char[][] getSectionalTermYear() {
@@ -1303,7 +1364,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         }
 
         public void setSectionalTermYear(char[][] sectionalTermYear) {
-            sectionalTermYear = sectionalTermYear;
+            this.sectionalTermYear = sectionalTermYear;
         }
 
         public char[][] getPrincipleTermMap() {
@@ -1311,7 +1372,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         }
 
         public void setPrincipleTermMap(char[][] principleTermMap) {
-            principleTermMap = principleTermMap;
+            this.principleTermMap = principleTermMap;
         }
 
         public char[][] getPrincipleTermYear() {
@@ -1319,7 +1380,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         }
 
         public void setPrincipleTermYear(char[][] principleTermYear) {
-            principleTermYear = principleTermYear;
+            this.principleTermYear = principleTermYear;
         }
 
         public String[] getMonthNames() {
@@ -1327,7 +1388,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         }
 
         public void setMonthNames(String[] monthNames) {
-            monthNames = monthNames;
+            this.monthNames = monthNames;
         }
 
         public String[] getChineseMonthNames() {
@@ -1335,7 +1396,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         }
 
         public void setChineseMonthNames(String[] chineseMonthNames) {
-            chineseMonthNames = chineseMonthNames;
+            this.chineseMonthNames = chineseMonthNames;
         }
 
         public String[] getPrincipleTermNames() {
@@ -1343,7 +1404,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         }
 
         public void setPrincipleTermNames(String[] principleTermNames) {
-            principleTermNames = principleTermNames;
+            this.principleTermNames = principleTermNames;
         }
 
         public String[] getSectionalTermNames() {
@@ -1351,7 +1412,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         }
 
         public void setSectionalTermNames(String[] sectionalTermNames) {
-            sectionalTermNames = sectionalTermNames;
+            this.sectionalTermNames = sectionalTermNames;
         }
 
         public void main(String[] arg) {
