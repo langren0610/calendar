@@ -1,4 +1,4 @@
-package com.chaojie.mycalcdata;
+package com.mixiu.me.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -138,7 +138,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
         /**设置主布局样式 start**/
         linearLayoutMain = new LinearLayout(mContext);
-        LayoutParams layoutParamsMian = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        LayoutParams layoutParamsMian = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         linearLayoutMain.setLayoutParams(layoutParamsMian);
         linearLayoutMain.setOrientation(VERTICAL);
         addView((linearLayoutMain));
@@ -150,7 +150,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         textViewTop = new TextView(context);
         textViewTop.setText(getTopTitle(date));
         textViewTop.setTextColor(getResources().getColor(android.R.color.black));
-        LayoutParams layoutParamsTop = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        LayoutParams layoutParamsTop = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         layoutParamsTop.setMargins(0, MARGIN_TOP, 0, 0);
         textViewTop.setGravity(Gravity.CENTER);
         textViewTop.setTextSize(TEXT_TOP_SIZE);
@@ -180,7 +180,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         for (int i = 0; i < ONE_WEEK; ++i) {
             /**设置星期布局样式 start**/
             LinearLayout linearLayoutChild = new LinearLayout(mContext);
-            LayoutParams layoutParamsChild = new LayoutParams(LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+            LayoutParams layoutParamsChild = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
             layoutParamsChild.weight = 1;
             linearLayoutChild.setOrientation(HORIZONTAL);
             linearLayoutChild.setLayoutParams(layoutParamsChild);
@@ -188,7 +188,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
             /**设置显示星期的textView样式 start**/
             TextView textView = new TextView(context);
-            LayoutParams layoutParams2 = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+            LayoutParams layoutParams2 = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
             layoutParams2.gravity = Gravity.CENTER;
             layoutParams2.setMargins(MARGIN_LEFT, MARGIN_TOP, MARGIN_RIGHT, MARGIN_BOTTOM);
             textView.setText(getWeekDay(i));
@@ -214,7 +214,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
         /**设置显示日期的主布局样式 start**/
         linearLayoutChild = new LinearLayout(mContext);
-        LayoutParams layoutParamsChild = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        LayoutParams layoutParamsChild = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         linearLayoutChild.setOrientation(VERTICAL);
         linearLayoutChild.setLayoutParams(layoutParamsChild);
         linearLayoutMain.addView(linearLayoutChild);
@@ -399,7 +399,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
                 viewHolderChild.textViewDay.setTextColor(Color.BLACK);
             }
 
-            if (selectYear == (date.getYear() + 1900) && selectMOnth == (date.getMonth() + 1) && selectDay == date.getDate()) {
+            if (selectYear == (date.getYear() + 1900) && selectMOnth == (date.getMonth() + 1) && selectDay == date.getDate() && today != selectDay) {
                 viewHolderChild.textViewDay.setBackgroundDrawable(drawableClickBg);
                 lastClickView = viewHolderChild.textViewDay;
             }
@@ -462,7 +462,22 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         selectYear = year;
         selectMOnth = month;
         selectDay = day;
+        currentYear = year - 1900;
+        currentMonth = month - 1;
         initCalendarDays(currentYear, currentMonth);
+
+        Date date = new Date();
+        date.setMonth(month - 1);
+        date.setDate(day);
+        date.setYear(year - 1900);
+        date.setHours(0);
+        date.setMinutes(0);
+        date.setSeconds(0);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dateTime = simpleDateFormat.format(date);
+        if (clickDateListener != null) {
+            clickDateListener.clickDate(dateTime);
+        }
     }
 
     /**设置点击日期监听接口**/
