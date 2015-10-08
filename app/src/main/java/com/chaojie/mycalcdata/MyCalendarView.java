@@ -158,6 +158,32 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         linearLayoutMain.addView(textViewTop);//将顶部显示的年月textview添加到主布局
         /**设置顶部显示年月样式 end**/
 
+        /***设置当天日期样式 start**/
+        LinearLayout linearLayout = new LinearLayout(mContext);
+        LayoutParams layoutParamsCurrentDate = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, TEXTVIEW_HEIGHT + 20);
+        linearLayout.setLayoutParams(layoutParamsCurrentDate);
+        linearLayout.setGravity(Gravity.CENTER);
+        linearLayoutMain.addView(linearLayout);
+
+        String currentDateText = "今天:" + (date.getYear() + 1900) + "年" + (date.getMonth() + 1) + "月" + date.getDate() + "日";
+        TextView textViewCurrentDate = new TextView(mContext);
+        LayoutParams layoutParamsCurrentTextViewDate = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParamsCurrentTextViewDate.setMargins(5, 5, 5, 5);
+        textViewCurrentDate.setLayoutParams(layoutParamsCurrentTextViewDate);
+        textViewCurrentDate.setText(currentDateText);
+        textViewCurrentDate.setTextSize(14);
+        textViewCurrentDate.setGravity(Gravity.CENTER);
+        linearLayout.addView(textViewCurrentDate);
+
+        linearLayout.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Date date1 = new Date();
+                initCalendarDays(date1.getYear(), date1.getMonth());
+            }
+        });
+        /***设置当天日期样式 end**/
+
         /**设置顶部年月下面的横线样式 start**/
         TextView textViewa = new TextView(context);
         LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, 1);
