@@ -316,7 +316,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
                 viewHolderChild.linearLayout.setId(i * ONE_WEEK + (j + 1));
                 viewHolderChild.linearLayout.setOnClickListener(this);//设置点击日期监听事件
-                //viewHolderChild.linearLayout.setOnTouchListener(this);
+                viewHolderChild.linearLayout.setOnTouchListener(this);
                 viewHolder.linearLayoutMain.setOnTouchListener(this);
             }
 
@@ -324,6 +324,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
             TextView textView1 = new TextView(context);
             layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, 1);
             layoutParams.setMargins(0, MARGIN_TOP, 0, 0);
+
             textView1.setLayoutParams(layoutParams);
             textView1.setBackgroundColor(Color.LTGRAY);
             linearLayoutChild.addView(textView1);
@@ -597,6 +598,12 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
             motionEventDownX = event.getX();
         } else if (action == MotionEvent.ACTION_UP) {
             float motionEventUpX = event.getX();
+            float po = motionEventDownX - motionEventUpX;
+            po = Math.abs(po);
+            if (po < 5) {//如果触摸屏幕的位置小于特定值,则视为点击事件
+                onClick(v);
+                return false;
+            }
             if ((motionEventUpX - motionEventDownX) >= INTERVAL_X) {//turn righr
                 if (currentMonth <= 0) {//如果当前显示的一经是一月份,则将当前月份置为11月,年份减一年
                     currentMonth = 11;
