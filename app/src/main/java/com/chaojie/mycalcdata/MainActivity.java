@@ -24,6 +24,11 @@ public class MainActivity extends AppCompatActivity implements MyCalendarView.Cl
 
         myCalendarView = (MyCalendarView) findViewById(R.id.mycalendrview);
         myCalendarView.setOnClickDateListener(this);
+        try {
+            myCalendarView.setVacationDate(2015, 10, 1, 7);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

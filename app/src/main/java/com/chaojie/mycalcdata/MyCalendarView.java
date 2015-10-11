@@ -9,6 +9,12 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.BackgroundColorSpan;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
@@ -25,6 +31,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by chaojie on 2015/9/28.
@@ -82,7 +89,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
     private final float INTERVAL_X = 30;
 
-    private final int TEXTVIEW_HEIGHT = 40;
+    private final int TEXTVIEW_HEIGHT = 60;
 
     /***设置选中的日期年份**/
     private int selectYear = 0;
@@ -93,6 +100,10 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
     private String CHUXI = "除夕";
     private String SPRING = "春节";
+    private String VACATION = "休";
+
+    /**假期日期**/
+    private List<Long> vacationList = new ArrayList<>();
 
     private final String LOG = MyCalendarView.class.getName();
 
@@ -205,13 +216,13 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         /**设置显示星期布局样式 end**/
 
         /**设置星期样式 start**/
-        Drawable drawable = new BitmapDrawable(bitmap);
         for (int i = 0; i < ONE_WEEK; ++i) {
             /**设置星期布局样式 start**/
             LinearLayout linearLayoutChild = new LinearLayout(mContext);
             LayoutParams layoutParamsChild = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
             layoutParamsChild.weight = 1;
             linearLayoutChild.setOrientation(HORIZONTAL);
+            layoutParamsChild.setMargins(MARGIN_LEFT, 0, 0, 0);
             linearLayoutChild.setLayoutParams(layoutParamsChild);
             /**设置星期布局样式 end**/
 
@@ -219,7 +230,6 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
             TextView textView = new TextView(context);
             LayoutParams layoutParams2 = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
             layoutParams2.gravity = Gravity.CENTER;
-            layoutParams2.setMargins(MARGIN_LEFT, MARGIN_TOP, MARGIN_RIGHT, MARGIN_BOTTOM);
             textView.setText(getWeekDay(i));
             textView.setGravity(Gravity.CENTER);
             textView.setLayoutParams(layoutParams2);
@@ -268,8 +278,8 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
             for (int j = 0; j < ONE_WEEK; ++j) {
                 /**设置一个日期布局样式 start**/
                 LayoutParams layoutParams3 = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-                layoutParams3.weight = 3;
-                layoutParams3.setMargins(MARGIN_LEFT, MARGIN_LITTLE, MARGIN_RIGHT, 0);
+                layoutParams3.weight = 1;
+                layoutParams3.setMargins(MARGIN_LEFT, 0, 0, 0);
 
                 ViewHolderChild viewHolderChild = new ViewHolderChild();
                 viewHolderChild.linearLayout = new LinearLayout(mContext);
@@ -379,6 +389,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         int today = todayDate.getDate();//当天的日期
 
         Date date = new Date();
+        date.setTime(0);
         date.setYear(year);
         date.setMonth(month);
         date.setDate(1);
@@ -401,7 +412,25 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
             int days1 = date.getDate();
             String daysStr = String.valueOf(days1);
-            viewHolderChild.textViewDay.setText(daysStr);
+            boolean found = false;
+            if (vacationList.size() > 0) {//查找是否有假期
+                for (Long time : vacationList) {
+                    if (time == date.getTime()) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if (found) {
+                daysStr = daysStr + " " + VACATION;
+                SpannableString span = new SpannableString(daysStr);
+                span.setSpan(new RelativeSizeSpan(0.5f), 2, 3, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                ForegroundColorSpan spanColor = new ForegroundColorSpan(Color.rgb(50, 192, 196));
+                span.setSpan(spanColor, 2, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                viewHolderChild.textViewDay.setText(span);
+            } else {
+                viewHolderChild.textViewDay.setText(daysStr);
+            }
 
             /***获取农历日期 start***/
             String chinesMonth = null;
@@ -520,6 +549,40 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         if (clickDateListener != null) {
             clickDateListener.clickDate(dateTime);
         }
+    }
+
+    /**
+     * 设置假期日期
+     * @param year 如2015
+     * @param month 1月到十二月
+     * @param startDate 开始日期 1号到31号
+     * @param endDate 结束日期 1号到31号
+     */
+    public void setVacationDate(int year, int month, int startDate, int endDate) throws Exception {
+        if (startDate > endDate) {
+            throw new Exception("开始时间不能大于结束时间.");
+        }
+        int newYear = year - 1900;
+        int newMonth = month - 1;
+        Date date = new Date();
+        date.setTime(0);
+        date.setYear(newYear);
+        date.setMonth(newMonth);
+        int days = getMonthDays(date);
+        if (startDate > days) {
+            throw new Exception("设置的假期开始天不在设置的月份里面.");
+        }
+        if (endDate > days) {
+            throw new Exception("设置的假期结束天不在设置的月份里面.");
+        }
+        date.setDate(startDate);
+        days = endDate - startDate + 1;
+        for (int i = 0; i < days; ++i) {
+            vacationList.add(date.getTime());
+            startDate = startDate + 1;
+            date.setDate(startDate);
+        }
+        initCalendarDays(currentYear, currentMonth);
     }
 
     /**设置点击日期监听接口**/
