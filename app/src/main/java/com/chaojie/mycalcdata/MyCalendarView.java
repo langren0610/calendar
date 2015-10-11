@@ -141,7 +141,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
         Bitmap bitmapClick = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(20);
+        paint.setStrokeWidth(10);
         canvas.setBitmap(bitmapClick);
         canvas.drawCircle(50, 50, 40, paint);
         drawableClickBg = new BitmapDrawable(bitmapClick);
