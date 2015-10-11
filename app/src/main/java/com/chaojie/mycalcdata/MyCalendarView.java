@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -103,7 +104,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
     private String VACATION = "休";
 
     /**假期日期**/
-    private List<Long> vacationList = new ArrayList<>();
+    private HashMap<Long, Long> vacationList = new HashMap<>();
 
     private final String LOG = MyCalendarView.class.getName();
 
@@ -412,24 +413,23 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
             int days1 = date.getDate();
             String daysStr = String.valueOf(days1);
-            boolean found = false;
-            if (vacationList.size() > 0) {//查找是否有假期
-                for (Long time : vacationList) {
-                    if (time == date.getTime()) {
-                        found = true;
-                        break;
+            try {
+                long timeKey = date.getTime();
+                if (vacationList.size() > 0 && vacationList.containsKey(timeKey)) {
+                    long vacationTime = vacationList.get(timeKey);
+                    if (vacationTime > 0) {
+                        daysStr = daysStr + VACATION;
+                        SpannableString span = new SpannableString(daysStr);
+                        span.setSpan(new RelativeSizeSpan(0.5f), 1, 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        ForegroundColorSpan spanColor = new ForegroundColorSpan(Color.rgb(50, 192, 196));
+                        span.setSpan(spanColor, 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        viewHolderChild.textViewDay.setText(span);
                     }
+                } else {
+                    viewHolderChild.textViewDay.setText(daysStr);
                 }
-            }
-            if (found) {
-                daysStr = daysStr + VACATION;
-                SpannableString span = new SpannableString(daysStr);
-                span.setSpan(new RelativeSizeSpan(0.5f), 2, 3, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                ForegroundColorSpan spanColor = new ForegroundColorSpan(Color.rgb(50, 192, 196));
-                span.setSpan(spanColor, 2, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                viewHolderChild.textViewDay.setText(span);
-            } else {
-                viewHolderChild.textViewDay.setText(daysStr);
+            } catch (Exception e) {
+                Log.e(LOG, "set date error", e);
             }
 
             /***获取农历日期 start***/
@@ -578,7 +578,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         date.setDate(startDate);
         days = endDate - startDate + 1;
         for (int i = 0; i < days; ++i) {
-            vacationList.add(date.getTime());
+            vacationList.put(date.getTime(), date.getTime());
             startDate = startDate + 1;
             date.setDate(startDate);
         }
