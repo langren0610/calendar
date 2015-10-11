@@ -422,7 +422,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
                 }
             }
             if (found) {
-                daysStr = daysStr + " " + VACATION;
+                daysStr = daysStr + VACATION;
                 SpannableString span = new SpannableString(daysStr);
                 span.setSpan(new RelativeSizeSpan(0.5f), 2, 3, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 ForegroundColorSpan spanColor = new ForegroundColorSpan(Color.rgb(50, 192, 196));
