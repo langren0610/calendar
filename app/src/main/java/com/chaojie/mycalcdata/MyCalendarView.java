@@ -91,6 +91,9 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
     /***设置选中的日期天**/
     private int selectDay = 0;
 
+    private String CHUXI = "除夕";
+    private String SPRING = "春节";
+
     private final String LOG = MyCalendarView.class.getName();
 
     public MyCalendarView(Context context) {
@@ -407,7 +410,11 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
                 chinesMonth = calendarUtil.getChineseMonth(date.getYear() + 1900, date.getMonth() + 1, date.getDate());
             }
             if (chinesMonth != null && !chinesMonth.isEmpty()) {
-                viewHolderChild.textViewLunar.setText(chinesMonth);
+                if (chinesMonth.equals(calendarUtil.getChineseMonth(0))) {
+                    viewHolderChild.textViewLunar.setText(SPRING);
+                } else {
+                    viewHolderChild.textViewLunar.setText(chinesMonth);
+                }
             } else {
                 viewHolderChild.textViewLunar.setText(lunar);
             }
@@ -447,6 +454,15 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
                 Log.e(LOG, "get chinese date error!", e);
             }
             /***获取二十四节气 end***/
+            /**获取除夕 start**/
+            chinesMonth = calendarUtil.getChineseMonth(date.getYear() + 1900, date.getMonth() + 1, date.getDate());
+            String chineseDate = calendarUtil.getChineseDay(28);
+            if (chinesMonth != null && chinesMonth.equals(calendarUtil.getChineseMonth(11))) {
+                if (lunar.equals(chineseDate)) {
+                    viewHolderChild.textViewLunar.setText(CHUXI);
+                }
+            }
+            /**获取除夕 end**/
             days1 = days1 + 1;
             date.setDate(days1);
 
@@ -625,6 +641,10 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
             c.computeSolarTerms();
             int cd = c.getChineseDate();
             return daysOfAlmanac[cd - 1];
+        }
+
+        private String getChineseMonth(int index) {
+            return monthOfAlmanac[index];
         }
 
         /**
