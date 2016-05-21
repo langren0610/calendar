@@ -2,17 +2,15 @@ package com.chaojie.mycalcdata;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
-import android.text.style.BackgroundColorSpan;
+import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.util.AttributeSet;
@@ -21,7 +19,6 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -32,7 +29,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Created by chaojie on 2015/9/28.
@@ -141,10 +137,11 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
         drawableNormal = new BitmapDrawable(bitmapNormal);
 
         Bitmap bitmapClick = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
-        paint.setStyle(Paint.Style.STROKE);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.rgb(46, 155, 0));
         paint.setStrokeWidth(10);
         canvas.setBitmap(bitmapClick);
-        canvas.drawCircle(50, 50, 40, paint);
+        canvas.drawCircle(50, 50, 45, paint);
         drawableClickBg = new BitmapDrawable(bitmapClick);
     }
 
@@ -223,7 +220,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
             LayoutParams layoutParamsChild = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
             layoutParamsChild.weight = 1;
             linearLayoutChild.setOrientation(HORIZONTAL);
-            layoutParamsChild.setMargins(MARGIN_LEFT, 0, 0, 0);
+            //layoutParamsChild.setMargins(MARGIN_LEFT, 0, 0, 0);
             linearLayoutChild.setLayoutParams(layoutParamsChild);
             /**设置星期布局样式 end**/
 
@@ -278,27 +275,30 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
             for (int j = 0; j < ONE_WEEK; ++j) {
                 /**设置一个日期布局样式 start**/
-                LayoutParams layoutParams3 = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+                LayoutParams layoutParams3 = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
                 layoutParams3.weight = 1;
-                layoutParams3.setMargins(MARGIN_LEFT, 0, 0, 0);
+                //layoutParams3.setMargins(MARGIN_LEFT - 10, 0, 0, 0);
 
                 ViewHolderChild viewHolderChild = new ViewHolderChild();
                 viewHolderChild.linearLayout = new LinearLayout(mContext);
                 viewHolderChild.linearLayout.setOrientation(VERTICAL);
                 viewHolderChild.linearLayout.setLayoutParams(layoutParams3);
+                viewHolderChild.linearLayout.setGravity(Gravity.CENTER);
                 /**设置一个日期布局样式 end**/
 
                 /**设置显示日期的textview start**/
-                LayoutParams layoutParamsText = new LayoutParams(TEXTVIEW_HEIGHT, TEXTVIEW_HEIGHT);
+                LayoutParams layoutParamsText = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                layoutParamsText.setMargins(0, 5, 0, 0);
                 //layoutParamsText.weight = 9;
 
                 viewHolderChild.textViewDay = new TextView(mContext);
                 viewHolderChild.textViewDay.setText("");
                 viewHolderChild.textViewDay.setTextSize(TEXT_DAY);
+                viewHolderChild.textViewDay.setTextColor(getResources().getColor(android.R.color.black));
                 viewHolderChild.textViewDay.setGravity(Gravity.CENTER);
                 viewHolderChild.textViewDay.setLayoutParams(layoutParamsText);
 
-                layoutParamsText = new LayoutParams(TEXTVIEW_HEIGHT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                layoutParamsText = new LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 layoutParamsText.setMargins(0, 10, 0, 0);
                 //layoutParamsText.weight = 5;
                 viewHolderChild.textViewLunar = new TextView(mContext);
@@ -464,6 +464,7 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
             if (selectYear == (date.getYear() + 1900) && selectMOnth == (date.getMonth() + 1) && selectDay == date.getDate() && today != selectDay) {
                 viewHolderChild.textViewDay.setBackgroundDrawable(drawableClickBg);
+                viewHolderChild.textViewDay.setTextColor(getResources().getColor(android.R.color.black));
                 lastClickView = viewHolderChild.textViewDay;
             }
 
@@ -511,8 +512,8 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
             List<ViewHolderChild> viewHolderChildList = viewHolder.viewHolderChildList;
             for (int j = 0; j < ONE_WEEK; ++j) {
                 ViewHolderChild viewHolderChild = viewHolderChildList.get(j);
-                viewHolderChild.textViewDay.setText(" ");
-                viewHolderChild.textViewLunar.setText(" ");
+                viewHolderChild.textViewDay.setText("");
+                viewHolderChild.textViewLunar.setText("");
                 viewHolderChild.linearLayout.setTag(null);
                 viewHolderChild.textViewDay.setBackgroundDrawable(drawableNormal);
                 viewHolderChild.textViewLunar.setTextColor(Color.BLACK);
@@ -627,16 +628,32 @@ public class MyCalendarView extends LinearLayout implements View.OnTouchListener
 
     @Override
     public void onClick(View v) {
-        String formatterTime = (String) v.getTag();
-        if (formatterTime != null && clickDateListener != null) {
-            if (lastClickView != null) {
-                lastClickView.setBackgroundDrawable(drawableNormal);
-            }
-            TextView textView =  (TextView)((ViewGroup) v).getChildAt(0);
-            textView.setBackgroundDrawable(drawableClickBg);
-            lastClickView = textView;
-            clickDateListener.clickDate(formatterTime);
-        }
+       try {
+           String formatterTime = (String) v.getTag();
+           if (formatterTime != null && clickDateListener != null) {
+               TextView textView =  (TextView)((ViewGroup) v).getChildAt(0);
+               if (lastClickView != null) {
+                   TextView textViewLast = (TextView) lastClickView;
+                   String currentDay = textView.getText().toString().trim();
+                   String textDay = textViewLast.getText().toString().trim();
+                   Date currentDate = new Date();
+                   if (!TextUtils.isEmpty(currentDay) && !TextUtils.isEmpty(textDay) &&
+                           !currentDay.equals(textDay) && Integer.valueOf(textDay) == currentDate.getDate()) {//如果是当前日期天数
+                       lastClickView.setBackgroundDrawable(drawableCurrentDayBg);
+                       textViewLast.setTextColor(Color.WHITE);
+                   } else {
+                       lastClickView.setBackgroundDrawable(drawableNormal);
+                       textViewLast.setTextColor(Color.BLACK);
+                   }
+               }
+               textView.setBackgroundDrawable(drawableClickBg);
+               textView.setTextColor(Color.WHITE);
+               lastClickView = textView;
+               clickDateListener.clickDate(formatterTime);
+           }
+       } catch (Exception e) {
+           e.printStackTrace();
+       }
     }
 
     private class ViewHolder {
